@@ -1,0 +1,13 @@
+2025-07-15 05:18:47,553 - INFO - ====== WebDriver manager ======
+2025-07-15 05:18:48,129 - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-15 05:18:48,282 - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-15 05:18:48,348 - INFO - Driver [/home/sidnei/.wdm/drivers/chromedriver/linux64/138.0.7204.94/chromedriver-linux64/chromedriver] found in cache
+2025-07-15 05:19:26,217 - INFO - ====== WebDriver manager ======
+2025-07-15 05:19:26,300 - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-15 05:19:26,369 - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-15 05:19:26,434 - INFO - Driver [/home/sidnei/.wdm/drivers/chromedriver/linux64/138.0.7204.94/chromedriver-linux64/chromedriver] found in cache
+2025-07-15 05:20:28,553 - INFO - ====== WebDriver manager ======
+2025-07-15 05:20:28,636 - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-15 05:20:28,701 - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-15 05:20:28,760 - INFO - Driver [/home/sidnei/.wdm/drivers/chromedriver/linux64/138.0.7204.94/chromedriver-linux64/chromedriver] found in cache
+2025-07-15 05:20:42,550 - INFO - Processando: dados/mcdonalds_nutricional.csv

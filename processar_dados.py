@@ -14,18 +14,112 @@ import time
 import re
 import logging
 from urllib.parse import quote
+import sys
+from selenium.common.exceptions import WebDriverException
+import shutil
+import platform
+
+# Adicionar imports do webdriver-manager
+try:
+    from webdriver_manager.chrome import ChromeDriverManager
+    from selenium.webdriver.chrome.service import Service as ChromeService
+except ImportError:
+    ChromeDriverManager = None
+    ChromeService = None
+try:
+    from webdriver_manager.firefox import GeckoDriverManager
+    from selenium.webdriver.firefox.service import Service as FirefoxService
+except ImportError:
+    GeckoDriverManager = None
+    FirefoxService = None
+try:
+    from webdriver_manager.core.utils import ChromeType
+except ImportError:
+    ChromeType = None
+
+
+def encontrar_navegador_possiveis(nomes):
+    """
+    Tenta encontrar o caminho do executável do navegador a partir de uma lista de nomes possíveis.
+    """
+    for nome in nomes:
+        caminho = shutil.which(nome)
+        if caminho:
+            return caminho
+    # Windows: tentar caminhos padrão
+    if platform.system() == "Windows":
+        possiveis = [
+            r"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+            r"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+            r"C:\\Program Files\\Mozilla Firefox\\firefox.exe",
+            r"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe",
+            r"C:\\Program Files\\Chromium\\Application\\chromium.exe",
+            r"C:\\Program Files (x86)\\Chromium\\Application\\chromium.exe",
+        ]
+        for caminho in possiveis:
+            if os.path.exists(caminho):
+                return caminho
+    return None
 
 def iniciar_driver():
+    """
+    Tenta iniciar o Chrome, depois Chromium, depois Firefox. Usa webdriver-manager para baixar o driver correto.
+    Detecta automaticamente o caminho do navegador no Linux e Windows.
+    """
     chrome_options = Options()
-    # NÃO usar headless para permitir interação manual
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
     chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
     chrome_options.add_experimental_option('useAutomationExtension', False)
-    driver = webdriver.Chrome(options=chrome_options)
-    driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
-    return driver
+    # Chrome padrão
+    chrome_path = encontrar_navegador_possiveis([
+        "google-chrome", "chrome", "chrome.exe"
+    ])
+    if chrome_path:
+        chrome_options.binary_location = chrome_path
+    try:
+        if ChromeDriverManager is not None and ChromeService is not None:
+            driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=chrome_options)
+            driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+            print(f"\n[INFO] Navegador Chrome detectado e iniciado em: {chrome_path or 'padrão do sistema'}\n")
+            return driver
+    except Exception as e:
+        print(f"[WARN] Chrome não pôde ser iniciado: {e}")
+    # Chromium
+    chromium_path = encontrar_navegador_possiveis([
+        "chromium", "chromium-browser", "chromium.exe"
+    ])
+    if chromium_path:
+        chrome_options.binary_location = chromium_path
+    try:
+        if ChromeDriverManager is not None and ChromeService is not None and ChromeType is not None:
+            driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()), options=chrome_options)
+            driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+            print(f"\n[INFO] Navegador Chromium detectado e iniciado em: {chromium_path or 'padrão do sistema'}\n")
+            return driver
+    except Exception as e:
+        print(f"[WARN] Chromium não pôde ser iniciado: {e}")
+    # Firefox
+    firefox_path = encontrar_navegador_possiveis([
+        "firefox", "firefox.exe"
+    ])
+    try:
+        if GeckoDriverManager is not None and FirefoxService is not None:
+            from selenium.webdriver.firefox.options import Options as FirefoxOptions
+            firefox_options = FirefoxOptions()
+            if firefox_path:
+                firefox_options.binary_location = firefox_path
+            driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=firefox_options)
+            print(f"\n[INFO] Navegador Firefox detectado e iniciado em: {firefox_path or 'padrão do sistema'}\n")
+            return driver
+    except Exception as e:
+        print(f"[WARN] Firefox não pôde ser iniciado: {e}")
+    print("\n[ERRO] Nenhum navegador suportado foi encontrado ou pôde ser iniciado.\n\n" \
+          "Certifique-se de ter o Google Chrome, Chromium ou Mozilla Firefox instalado.\n" \
+          "Se estiver em ambiente de servidor, instale um navegador gráfico.\n" \
+          "Se o erro persistir, consulte o README.md para instruções detalhadas.\n")
+    sys.exit(1)
 
 def buscar_ean_bluesoft_selenium(driver, produto):
     try:
@@ -136,6 +230,11 @@ def main():
         print('Nenhum arquivo CSV encontrado na pasta dados/')
         return
     driver = iniciar_driver()
+    # Abrir direto no site do Cosmos Bluesoft
+    try:
+        driver.get("https://cosmos.bluesoft.com.br")
+    except Exception as e:
+        print(f"[ERRO] Não foi possível acessar o site do Cosmos Bluesoft: {e}")
     print("\n" + "="*60)
     print("""
 ████████████████████████████████████████████████████████████████████████████

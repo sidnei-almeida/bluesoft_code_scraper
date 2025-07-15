@@ -13,8 +13,7 @@ Repositório oficial: [https://github.com/sidnei-almeida/ean_code_finder](https:
 
 ## ⚙️ Requisitos
 - **Python 3.13** (ou superior)
-- **Google Chrome** instalado
-- **ChromeDriver** compatível com sua versão do Chrome (deve estar no PATH)
+- **Google Chrome** ou **Mozilla Firefox** instalado
 - **pip** para instalar dependências
 
 ## 📦 Instalação
@@ -34,9 +33,9 @@ Repositório oficial: [https://github.com/sidnei-almeida/ean_code_finder](https:
    ```bash
    pip install -r requirements.txt
    ```
-4. Certifique-se de que o ChromeDriver está instalado e no PATH.
-   - [Download ChromeDriver](https://sites.google.com/chromium.org/driver/)
-   - Dica: a versão do ChromeDriver deve ser igual à do seu Google Chrome.
+
+> **Não é mais necessário baixar o ChromeDriver ou GeckoDriver manualmente!**
+> O script usa o [webdriver-manager](https://github.com/SergeyPirogov/webdriver_manager) para instalar e gerenciar o driver automaticamente, tanto no Windows quanto no Linux ou Mac.
 
 ## 📂 Como preparar os dados
 1. Crie uma pasta chamada `dados` na raiz do projeto (se ainda não existir).
@@ -48,16 +47,19 @@ Repositório oficial: [https://github.com/sidnei-almeida/ean_code_finder](https:
    ```bash
    python processar_dados.py
    ```
-2. **Leia com atenção o aviso no terminal!**
+2. O script tentará abrir o Google Chrome automaticamente. Se não encontrar, tentará o Mozilla Firefox.
+   - Certifique-se de ter pelo menos um desses navegadores instalado.
+   - O driver será baixado automaticamente na primeira execução.
+3. **Leia com atenção o aviso no terminal!**
    - Assim que o navegador abrir, **passe manualmente pela verificação do Cloudflare** (página "Um momento..." ou "Checking your browser...").
    - **Só aperte ENTER no terminal depois que o site estiver totalmente carregado e a barra de busca aparecer.**
    - **NÃO feche o navegador enquanto o script estiver rodando!**
-3. O script vai processar todos os CSVs na pasta `dados/`, preenchendo a coluna `BARCODE` com o código encontrado para cada produto.
-4. **Se o Cloudflare aparecer novamente durante o processo:**
+4. O script vai processar todos os CSVs na pasta `dados/`, preenchendo a coluna `BARCODE` com o código encontrado para cada produto.
+5. **Se o Cloudflare aparecer novamente durante o processo:**
    - O script vai pausar automaticamente e mostrar um aviso super chamativo.
    - Resolva o Cloudflare manualmente no navegador e só então aperte ENTER no terminal para continuar.
    - Pode demorar alguns segundos para o script continuar após o ENTER.
-5. **Se alguns produtos não encontrarem código de barras:**
+6. **Se alguns produtos não encontrarem código de barras:**
    - Isso é normal e geralmente é culpa do Cloudflare.
    - Você pode rodar o script novamente só com esses produtos em um novo CSV para tentar buscar os códigos que faltaram.
 
@@ -74,6 +76,7 @@ Leite Integral 1L
 - Um log detalhado será salvo em `processar_dados.log`.
 
 ## 💡 Dicas importantes
+- **Compatível com Windows, Linux e Mac!**
 - **Tenha paciência!** O Cloudflare pode aparecer mais de uma vez durante o processo.
 - **Às vezes o Cloudflare entra em um loop de carregamento infinito** (fica só "carregando" e não aparece a caixinha para clicar). Isso é normal e acontece por proteção do site. **Nesses casos, espere alguns minutos sem fechar a página**: normalmente, depois de um tempo, o Cloudflare libera e a caixinha volta a aparecer para você clicar. 
 - **Vale a pena tentar apertar F5 (atualizar a página)** para ver se o Cloudflare libera, mas **NUNCA feche a página do navegador** enquanto o script estiver rodando! Se fechar, o script vai perder a conexão com o navegador e dará erro.
