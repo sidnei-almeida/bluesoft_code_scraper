@@ -2,6 +2,8 @@
 
 Este projeto automatiza a busca de códigos de barras (EAN/GTIN) de produtos no site cosmos.bluesoft.com.br, preenchendo automaticamente a coluna BARCODE em arquivos CSV de produtos.
 
+Repositório oficial: [https://github.com/sidnei-almeida/ean_code_finder](https://github.com/sidnei-almeida/ean_code_finder)
+
 ## 🚀 Funcionalidades
 - Busca automática do código EAN/GTIN de cada produto usando o campo de busca do Cosmos Bluesoft.
 - Atualiza/cria a coluna `BARCODE` em cada CSV processado.
@@ -18,7 +20,7 @@ Este projeto automatiza a busca de códigos de barras (EAN/GTIN) de produtos no 
 ## 📦 Instalação
 1. Clone o repositório:
    ```bash
-   git clone <url-do-repositorio>
+   git clone https://github.com/sidnei-almeida/ean_code_finder.git
    cd ean_code_finder
    ```
 2. Crie e ative um ambiente virtual (opcional, mas recomendado):
@@ -73,12 +75,14 @@ Leite Integral 1L
 
 ## 💡 Dicas importantes
 - **Tenha paciência!** O Cloudflare pode aparecer mais de uma vez durante o processo.
+- **Às vezes o Cloudflare entra em um loop de carregamento infinito** (fica só "carregando" e não aparece a caixinha para clicar). Isso é normal e acontece por proteção do site. **Nesses casos, espere alguns minutos sem fechar a página**: normalmente, depois de um tempo, o Cloudflare libera e a caixinha volta a aparecer para você clicar. 
+- **Vale a pena tentar apertar F5 (atualizar a página)** para ver se o Cloudflare libera, mas **NUNCA feche a página do navegador** enquanto o script estiver rodando! Se fechar, o script vai perder a conexão com o navegador e dará erro.
 - **Nunca feche o navegador enquanto o script estiver rodando.**
 - Se o script for interrompido, você pode rodar novamente apenas com os produtos que faltaram.
 - O tempo de espera entre buscas e pausas periódicas são essenciais para evitar bloqueios.
 
 ## ❓ Dúvidas ou problemas?
-Se tiver qualquer dúvida, problema ou sugestão, abra uma issue ou entre em contato!
+Se tiver qualquer dúvida, problema ou sugestão, abra uma issue ou entre em contato pelo [repositório no GitHub](https://github.com/sidnei-almeida/ean_code_finder).
 
 ---
 
