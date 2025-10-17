@@ -7,6 +7,11 @@ Repositório oficial: [https://github.com/sidnei-almeida/bluesoft_code_scraper](
 ## 🚀 Funcionalidades
 - Busca automática do código EAN/GTIN de cada produto usando o campo de busca do Cosmos Bluesoft.
 - Atualiza/cria a coluna `codigo` em cada CSV processado.
+- **🛡️ Anti-detecção de bot:** Usa `undetected-chromedriver` e técnicas de humanização para evitar rate limiting:
+  - Scroll e movimentos de mouse aleatórios
+  - Delays aleatórios entre ações (3-5s entre buscas)
+  - Pausas periódicas a cada 15 produtos
+  - Comportamento natural de navegação
 - **✨ Busca inteligente:** O script verifica automaticamente quais produtos já têm código e pula eles, buscando apenas os necessários desde o início!
 - **🔄 Múltiplas tentativas:** Faz até 3 tentativas automaticamente para encontrar códigos de produtos faltantes.
 - **📊 Estatísticas detalhadas:** Mostra taxa de sucesso e progresso em tempo real.
@@ -15,9 +20,11 @@ Repositório oficial: [https://github.com/sidnei-almeida/bluesoft_code_scraper](
 - Log detalhado do processo em `processar_dados.log`.
 
 ## ⚙️ Requisitos
-- **Python 3.13** (ou superior)
-- **Google Chrome** ou **Mozilla Firefox** instalado
+- **Python 3.9+** (testado em Python 3.12 e 3.13)
+- **Google Chrome** (recomendado para melhor evasão de detecção)
 - **pip** para instalar dependências
+
+**Nota:** O script usa `undetected-chromedriver` para evitar detecção de bot e rate limiting do Cloudflare. Para Python 3.12+, o `setuptools` é necessário (já incluído no requirements.txt).
 
 ## 📦 Instalação
 1. Clone o repositório:
@@ -55,14 +62,21 @@ Repositório oficial: [https://github.com/sidnei-almeida/bluesoft_code_scraper](
    - O driver será baixado automaticamente na primeira execução.
 3. **Leia com atenção o aviso no terminal!**
    - Assim que o navegador abrir, **passe manualmente pela verificação do Cloudflare** (página "Um momento..." ou "Checking your browser...").
-   - **Só aperte ENTER no terminal depois que o site estiver totalmente carregado e a barra de busca aparecer.**
+   - **IMPORTANTE:** Faça 2-3 buscas MANUAIS no site antes de apertar ENTER:
+     - Digite alguns produtos na barra de busca
+     - Clique nos resultados, navegue pelas páginas
+     - Isso "aquece" a sessão e evita rate limiting
+   - **Só aperte ENTER no terminal DEPOIS de fazer essas buscas manuais.**
    - **NÃO feche o navegador enquanto o script estiver rodando!**
 4. **O script vai:**
    - Verificar automaticamente quais produtos já têm código nos CSVs
    - Mostrar quantos produtos precisam de código
    - Pular produtos que já têm código e buscar apenas os necessários
+   - Usar comportamento humanizado para evitar detecção (delays aleatórios, scroll, etc)
    - Fazer até 3 tentativas para cada produto sem código
    - Mostrar estatísticas em tempo real e ao final do processo
+   
+   **⚠️ IMPORTANTE:** O processo é MAIS LENTO que antes (3-5s por produto + pausas), mas isso é necessário para evitar rate limiting e bloqueios.
 5. **Se o Cloudflare aparecer novamente durante o processo:**
    - O script vai pausar automaticamente e mostrar um aviso super chamativo.
    - Resolva o Cloudflare manualmente no navegador e só então aperte ENTER no terminal para continuar.
@@ -109,15 +123,21 @@ Leite Integral 1L,7891000100103
 - Os arquivos CSV originais na pasta `dados/` são atualizados com a coluna `codigo` preenchida.
 - Um log detalhado é salvo em `processar_dados.log`.
 
-## 🧠 Como funciona a busca inteligente
+## 🧠 Como funciona a busca inteligente e anti-detecção
 
-O script agora trabalha de forma muito mais eficiente:
+O script combina eficiência com segurança:
 
 1. **Análise inicial:** Ao iniciar, verifica todos os CSVs e conta quantos produtos já têm código
 2. **Pula produtos completos:** Não perde tempo buscando produtos que já têm código
-3. **Múltiplas tentativas:** Para produtos sem código, faz até 3 tentativas automáticas
-4. **Estatísticas em tempo real:** Mostra progresso e taxa de sucesso durante o processo
-5. **Execução incremental:** Se rodar o script várias vezes, ele sempre continua de onde parou
+3. **Comportamento humanizado:** 
+   - Faz scroll aleatório nas páginas
+   - Move o mouse de forma natural
+   - Usa delays aleatórios (não fixos)
+   - Pausas estratégicas durante o processo
+4. **Múltiplas tentativas:** Para produtos sem código, faz até 3 tentativas automáticas
+5. **Estatísticas em tempo real:** Mostra progresso e taxa de sucesso durante o processo
+6. **Execução incremental:** Se rodar o script várias vezes, ele sempre continua de onde parou
+7. **Anti-detecção:** Usa `undetected-chromedriver` que é muito mais difícil de detectar que Selenium normal
 
 **Exemplo de execução:**
 ```
@@ -140,13 +160,19 @@ O script agora trabalha de forma muito mais eficiente:
 
 ## 💡 Dicas importantes
 - **Compatível com Windows, Linux e Mac!**
+- **🛡️ Configurado para segurança contra rate limiting:**
+  - 3-5s aleatórios entre cada busca
+  - Scroll e movimentos de mouse automáticos
+  - 10-15s de pausa a cada 15 produtos
+  - Comportamento natural para evitar detecção
+- **⏱️ Processo balanceado:** Espere ~5-8s por produto. Rápido o suficiente mas seguro contra bloqueios.
+- **🔑 Faça buscas manuais primeiro:** Sempre faça 2-3 buscas manuais no site antes de apertar ENTER.
 - **Tenha paciência!** O Cloudflare pode aparecer mais de uma vez durante o processo.
 - **Às vezes o Cloudflare entra em um loop de carregamento infinito** (fica só "carregando" e não aparece a caixinha para clicar). Isso é normal e acontece por proteção do site. **Nesses casos, espere alguns minutos sem fechar a página**: normalmente, depois de um tempo, o Cloudflare libera e a caixinha volta a aparecer para você clicar. 
 - **Vale a pena tentar apertar F5 (atualizar a página)** para ver se o Cloudflare libera, mas **NUNCA feche a página do navegador** enquanto o script estiver rodando! Se fechar, o script vai perder a conexão com o navegador e dará erro.
 - **Nunca feche o navegador enquanto o script estiver rodando.**
-- **Se o script for interrompido:** Sem problemas! Execute novamente e ele vai pular automaticamente os produtos que já têm código de barras, buscando apenas os faltantes.
-- **Busca inteligente:** O script faz múltiplas passagens automaticamente para tentar encontrar todos os códigos de barras possíveis.
-- O tempo de espera entre buscas e pausas periódicas são essenciais para evitar bloqueios.
+- **Se o script for interrompido:** Sem problemas! Execute novamente e ele vai pular automaticamente os produtos que já têm código, buscando apenas os faltantes.
+- **Busca inteligente:** O script faz múltiplas passagens automaticamente para tentar encontrar todos os códigos possíveis.
 
 ## ❓ Dúvidas ou problemas?
 Se tiver qualquer dúvida, problema ou sugestão, abra uma issue ou entre em contato pelo [repositório no GitHub](https://github.com/sidnei-almeida/bluesoft_code_scraper).

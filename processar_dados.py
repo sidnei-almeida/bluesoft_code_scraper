@@ -18,6 +18,8 @@ import sys
 from selenium.common.exceptions import WebDriverException
 import shutil
 import platform
+import random
+from selenium.webdriver.common.action_chains import ActionChains
 
 # Adicionar imports do webdriver-manager
 try:
@@ -37,6 +39,57 @@ try:
 except ImportError:
     ChromeType = None
 
+# Tentar importar undetected_chromedriver
+try:
+    import undetected_chromedriver as uc
+    UC_AVAILABLE = True
+except ImportError:
+    UC_AVAILABLE = False
+    print("[WARN] undetected-chromedriver não instalado. Usando Chrome normal (mais detectável).")
+
+
+def delay_aleatorio(min_sec, max_sec):
+    """
+    Espera um tempo aleatório entre min_sec e max_sec segundos.
+    """
+    time.sleep(random.uniform(min_sec, max_sec))
+
+def scroll_aleatorio(driver):
+    """
+    Faz scroll aleatório na página para simular comportamento humano.
+    """
+    try:
+        scroll_amount = random.randint(200, 500)
+        driver.execute_script(f"window.scrollBy(0, {scroll_amount});")
+        delay_aleatorio(0.5, 1.2)
+        # Às vezes volta um pouco (comportamento natural)
+        if random.random() > 0.7:
+            driver.execute_script(f"window.scrollBy(0, -{random.randint(50, 150)});")
+            delay_aleatorio(0.3, 0.7)
+    except:
+        pass
+
+def movimento_mouse_aleatorio(driver):
+    """
+    Move o mouse aleatoriamente para simular leitura.
+    """
+    try:
+        action = ActionChains(driver)
+        # Move para posição aleatória
+        x_offset = random.randint(100, 500)
+        y_offset = random.randint(100, 400)
+        action.move_by_offset(x_offset, y_offset).perform()
+        delay_aleatorio(0.2, 0.5)
+    except:
+        pass
+
+def digitar_como_humano(element, text):
+    """
+    Digita texto caractere por caractere com delays aleatórios para simular digitação humana.
+    """
+    for char in text:
+        element.send_keys(char)
+        time.sleep(random.uniform(0.05, 0.15))
 
 def encontrar_navegador_possiveis(nomes):
     """
@@ -63,9 +116,24 @@ def encontrar_navegador_possiveis(nomes):
 
 def iniciar_driver():
     """
-    Tenta iniciar o Chrome, depois Chromium, depois Firefox. Usa webdriver-manager para baixar o driver correto.
-    Detecta automaticamente o caminho do navegador no Linux e Windows.
+    Tenta iniciar o Chrome com undetected-chromedriver, depois Chromium, depois Firefox.
+    Usa undetected-chromedriver quando disponível para evitar detecção de bot.
     """
+    # Tentar usar undetected-chromedriver primeiro (melhor anti-detecção)
+    if UC_AVAILABLE:
+        try:
+            options = uc.ChromeOptions()
+            options.add_argument("--no-sandbox")
+            options.add_argument("--disable-dev-shm-usage")
+            # Não adicionar flags que detectam automação
+            driver = uc.Chrome(options=options, version_main=None)
+            print(f"\n[INFO] ✅ Navegador Chrome iniciado com undetected-chromedriver (anti-detecção ativada)\n")
+            return driver
+        except Exception as e:
+            print(f"[WARN] undetected-chromedriver falhou: {e}")
+            print("[INFO] Tentando Chrome normal...")
+    
+    # Fallback para Chrome normal
     chrome_options = Options()
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
@@ -125,7 +193,11 @@ def buscar_ean_bluesoft_selenium(driver, produto):
     try:
         # Garantir que está na home do cosmos
         driver.get("https://cosmos.bluesoft.com.br")
-        time.sleep(2)
+        delay_aleatorio(2, 3.5)  # Delay aleatório em vez de fixo
+        
+        # Simular leitura da página (scroll)
+        scroll_aleatorio(driver)
+        
         # Procurar campo de busca
         search_selectors = [
             "input[type='search']",
@@ -149,11 +221,18 @@ def buscar_ean_bluesoft_selenium(driver, produto):
                 continue
         if not search_field:
             return ''
-        # Fazer a busca
+        
+        # Simular movimento do mouse
+        movimento_mouse_aleatorio(driver)
+        delay_aleatorio(0.5, 1)
+        
+        # Fazer a busca (copiar e colar é mais rápido e ainda funciona)
         search_field.clear()
-        search_field.send_keys(produto)
+        delay_aleatorio(0.3, 0.7)
+        search_field.send_keys(produto)  # Copia e cola direto
+        delay_aleatorio(0.5, 1.2)
         search_field.send_keys(Keys.RETURN)
-        time.sleep(5)  # Espera resultados
+        delay_aleatorio(3, 5)  # Espera resultados com delay aleatório
         # Verificar Cloudflare
         if 'um momento' in driver.title.lower() or 'checking' in driver.title.lower():
             print("\n" + "#"*60)
@@ -220,10 +299,14 @@ def processar_csv_selenium(driver, caminho_csv, apenas_faltantes=False):
         else:
             print(f'❌ Código não encontrado')
         
-        time.sleep(3)  # Espera entre buscas
-        if (idx + 1) % 20 == 0:
-            print('Aguardando 10 segundos para evitar bloqueio...')
-            time.sleep(10)
+        # Delay aleatório entre buscas para parecer humano
+        delay_aleatorio(3, 5)
+        
+        # Pausas mais longas periodicamente
+        if (idx + 1) % 15 == 0:
+            tempo_pausa = random.uniform(10, 15)
+            print(f'Aguardando {tempo_pausa:.1f} segundos para evitar bloqueio...')
+            time.sleep(tempo_pausa)
     
     df.to_csv(caminho_csv, index=False, encoding='utf-8')
     logging.info(f'Arquivo atualizado: {caminho_csv}')
@@ -271,25 +354,36 @@ def main():
         driver.get("https://cosmos.bluesoft.com.br")
     except Exception as e:
         print(f"[ERRO] Não foi possível acessar o site do Cosmos Bluesoft: {e}")
-    print("\n" + "="*60)
+    print("\n" + "="*80)
     print("""
 ████████████████████████████████████████████████████████████████████████████
 ⚠️  ATENÇÃO! PASSO OBRIGATÓRIO PARA O USUÁRIO ⚠️
 
-1️⃣  Assim que o navegador abrir, você PRECISA passar manualmente pela verificação do Cloudflare (página 'Um momento...' ou 'Checking your browser...').
+1️⃣  Passe pela verificação do Cloudflare (página 'Um momento...' ou 'Checking...')
 
-2️⃣  Só APERTE ENTER aqui no terminal DEPOIS que o site cosmos.bluesoft.com.br estiver totalmente carregado e você conseguir ver a barra de busca normalmente.
+2️⃣  IMPORTANTE - Para evitar rate limit, faça 2-3 buscas MANUAIS no site:
+    • Digite alguns nomes de produtos na barra de busca
+    • Clique nos resultados, navegue pelas páginas
+    • Isso ajuda a "aquecer" a sessão e evita bloqueios
 
-3️⃣  IMPORTANTE: O Cloudflare pode aparecer NOVAMENTE no meio do processo! Se isso acontecer, o script vai PAUSAR AUTOMATICAMENTE e pedir para você resolver de novo. Tenha PACIÊNCIA, aguarde o Cloudflare liberar e só então aperte ENTER para continuar.
+3️⃣  Só APERTE ENTER aqui DEPOIS de fazer essas buscas manuais!
 
-4️⃣  NOVIDADE: O script agora faz buscas automáticas adicionais para produtos que não encontraram código! Não precisa mais criar CSV manualmente para dados faltantes.
+4️⃣  O Cloudflare pode aparecer durante o processo - se acontecer, o script
+    pausará automaticamente. Resolva e aperte ENTER para continuar.
+
+5️⃣  O script usa comportamento humanizado (delays aleatórios, scroll, etc)
+    para evitar detecção. O processo será mais LENTO mas SEGURO.
 
 NÃO FECHE O NAVEGADOR enquanto o script estiver rodando!
 
 ████████████████████████████████████████████████████████████████████████████
 """)
-    print("="*60 + "\n")
-    input("Aperte ENTER aqui no terminal APÓS passar pelo Cloudflare no navegador!")
+    print("="*80 + "\n")
+    input("Aperte ENTER aqui APÓS fazer 2-3 buscas manuais no navegador!")
+    
+    # Aguardar um pouco mais após o usuário apertar ENTER
+    print("\n✅ ENTER reconhecido! Aguardando alguns segundos antes de iniciar...\n")
+    delay_aleatorio(3, 5)
     
     # Número máximo de tentativas para buscar produtos faltantes
     max_tentativas = 3
