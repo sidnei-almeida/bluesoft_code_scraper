@@ -1,14 +1,14 @@
 # EAN/GTIN Finder Automático para Cosmos Bluesoft
 
-Este projeto automatiza a busca de códigos de barras (EAN/GTIN) de produtos no site cosmos.bluesoft.com.br, preenchendo automaticamente a coluna BARCODE em arquivos CSV de produtos.
+Este projeto automatiza a busca de códigos de barras (EAN/GTIN) de produtos no site cosmos.bluesoft.com.br, preenchendo automaticamente a coluna `codigo` em arquivos CSV de produtos.
 
-Repositório oficial: [https://github.com/sidnei-almeida/ean_code_finder](https://github.com/sidnei-almeida/ean_code_finder)
+Repositório oficial: [https://github.com/sidnei-almeida/bluesoft_code_scraper](https://github.com/sidnei-almeida/bluesoft_code_scraper)
 
 ## 🚀 Funcionalidades
 - Busca automática do código EAN/GTIN de cada produto usando o campo de busca do Cosmos Bluesoft.
-- Atualiza/cria a coluna `BARCODE` em cada CSV processado.
-- **✨ Busca inteligente:** O script verifica automaticamente quais produtos já têm código de barras e pula eles, buscando apenas os necessários desde o início!
-- **🔄 Múltiplas tentativas:** Faz até 3 tentativas automaticamente para encontrar códigos de barras de produtos faltantes.
+- Atualiza/cria a coluna `codigo` em cada CSV processado.
+- **✨ Busca inteligente:** O script verifica automaticamente quais produtos já têm código e pula eles, buscando apenas os necessários desde o início!
+- **🔄 Múltiplas tentativas:** Faz até 3 tentativas automaticamente para encontrar códigos de produtos faltantes.
 - **📊 Estatísticas detalhadas:** Mostra taxa de sucesso e progresso em tempo real.
 - Suporte a múltiplos arquivos CSV na pasta `dados/`.
 - Detecção automática do Cloudflare durante o processo, com instruções claras para o usuário.
@@ -22,8 +22,8 @@ Repositório oficial: [https://github.com/sidnei-almeida/ean_code_finder](https:
 ## 📦 Instalação
 1. Clone o repositório:
    ```bash
-   git clone https://github.com/sidnei-almeida/ean_code_finder.git
-   cd ean_code_finder
+   git clone https://github.com/sidnei-almeida/bluesoft_code_scraper.git
+   cd bluesoft_code_scraper
    ```
 2. Crie e ative um ambiente virtual (opcional, mas recomendado):
    ```bash
@@ -58,8 +58,8 @@ Repositório oficial: [https://github.com/sidnei-almeida/ean_code_finder](https:
    - **Só aperte ENTER no terminal depois que o site estiver totalmente carregado e a barra de busca aparecer.**
    - **NÃO feche o navegador enquanto o script estiver rodando!**
 4. **O script vai:**
-   - Verificar automaticamente quais produtos já têm código de barras nos CSVs
-   - Mostrar quantos produtos precisam de código de barras
+   - Verificar automaticamente quais produtos já têm código nos CSVs
+   - Mostrar quantos produtos precisam de código
    - Pular produtos que já têm código e buscar apenas os necessários
    - Fazer até 3 tentativas para cada produto sem código
    - Mostrar estatísticas em tempo real e ao final do processo
@@ -82,9 +82,9 @@ Arroz Branco Tipo 1 5kg
 Leite Integral 1L
 ```
 
-**Depois (com barcodes):**
+**Depois (com códigos):**
 ```csv
-NOME,BARCODE
+NOME,codigo
 Coca-Cola 2L,7894900011517
 Arroz Branco Tipo 1 5kg,7896005200025
 Leite Integral 1L,7891000100103
@@ -92,28 +92,28 @@ Leite Integral 1L,7891000100103
 
 **Se executar novamente com produtos parcialmente preenchidos:**
 ```csv
-NOME,BARCODE
+NOME,codigo
 Coca-Cola 2L,7894900011517
 Arroz Branco Tipo 1 5kg,
 Leite Integral 1L,7891000100103
 ```
 ↓ *O script pula produtos que já têm código e busca apenas o que falta*
 ```csv
-NOME,BARCODE
+NOME,codigo
 Coca-Cola 2L,7894900011517
 Arroz Branco Tipo 1 5kg,7896005200025
 Leite Integral 1L,7891000100103
 ```
 
 ## 🗂️ Saída
-- Os arquivos CSV originais na pasta `dados/` são atualizados com a coluna `BARCODE` preenchida.
+- Os arquivos CSV originais na pasta `dados/` são atualizados com a coluna `codigo` preenchida.
 - Um log detalhado é salvo em `processar_dados.log`.
 
 ## 🧠 Como funciona a busca inteligente
 
 O script agora trabalha de forma muito mais eficiente:
 
-1. **Análise inicial:** Ao iniciar, verifica todos os CSVs e conta quantos produtos já têm código de barras
+1. **Análise inicial:** Ao iniciar, verifica todos os CSVs e conta quantos produtos já têm código
 2. **Pula produtos completos:** Não perde tempo buscando produtos que já têm código
 3. **Múltiplas tentativas:** Para produtos sem código, faz até 3 tentativas automáticas
 4. **Estatísticas em tempo real:** Mostra progresso e taxa de sucesso durante o processo
@@ -122,12 +122,12 @@ O script agora trabalha de forma muito mais eficiente:
 **Exemplo de execução:**
 ```
 📊 Verificando produtos nos CSVs...
-📄 alimentos.csv: 45 produtos sem barcode
-📄 bebidas.csv: 23 produtos sem barcode
+📄 alimentos.csv: 45 produtos sem código
+📄 bebidas.csv: 23 produtos sem código
 
-🎯 Total de 68 produtos precisam de código de barras
+🎯 Total de 68 produtos precisam de código
 
-🔍 TENTATIVA 1/3 - Buscando 68 produtos sem barcode...
+🔍 TENTATIVA 1/3 - Buscando 68 produtos sem código...
 📄 Arquivo: alimentos.csv (45 produtos faltantes)
 [1/45] Buscando: Coca-Cola 2L
 ✅ Código encontrado: 7894900011517
@@ -149,7 +149,7 @@ O script agora trabalha de forma muito mais eficiente:
 - O tempo de espera entre buscas e pausas periódicas são essenciais para evitar bloqueios.
 
 ## ❓ Dúvidas ou problemas?
-Se tiver qualquer dúvida, problema ou sugestão, abra uma issue ou entre em contato pelo [repositório no GitHub](https://github.com/sidnei-almeida/ean_code_finder).
+Se tiver qualquer dúvida, problema ou sugestão, abra uma issue ou entre em contato pelo [repositório no GitHub](https://github.com/sidnei-almeida/bluesoft_code_scraper).
 
 ---
 

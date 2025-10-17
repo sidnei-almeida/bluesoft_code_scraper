@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Processa todos os CSVs na pasta dados/ usando Selenium, com pausa manual para Cloudflare, busca EAN/GTIN de cada produto, espera 3s entre cada, 10s a cada 5, atualiza BARCODE.
+Processa todos os CSVs na pasta dados/ usando Selenium, com pausa manual para Cloudflare, busca EAN/GTIN de cada produto, espera 3s entre cada, 10s a cada 5, atualiza coluna 'codigo'.
 """
 
 import os
@@ -197,14 +197,14 @@ def processar_csv_selenium(driver, caminho_csv, apenas_faltantes=False):
         logging.warning(f"Coluna 'NOME' ou 'nome' não encontrada em {caminho_csv}. Pulando arquivo.")
         return 0
     
-    # Se a coluna BARCODE não existir, criar ela
-    if 'BARCODE' not in df.columns:
-        df['BARCODE'] = ''
+    # Se a coluna codigo não existir, criar ela
+    if 'codigo' not in df.columns:
+        df['codigo'] = ''
     
     produtos_processados = 0
     for idx, row in df.iterrows():
-        # Se apenas_faltantes=True, pular produtos que já têm barcode
-        if apenas_faltantes and pd.notna(row.get('BARCODE')) and str(row.get('BARCODE')).strip():
+        # Se apenas_faltantes=True, pular produtos que já têm codigo
+        if apenas_faltantes and pd.notna(row.get('codigo')) and str(row.get('codigo')).strip():
             continue
         
         produto = str(row[nome_column]).strip()
@@ -214,7 +214,7 @@ def processar_csv_selenium(driver, caminho_csv, apenas_faltantes=False):
         print(f'[{idx+1}/{len(df)}] Buscando: {produto}')
         codigo = buscar_ean_bluesoft_selenium(driver, produto)
         if codigo:
-            df.at[idx, 'BARCODE'] = codigo
+            df.at[idx, 'codigo'] = codigo
             print(f'✅ Código encontrado: {codigo}')
             produtos_processados += 1
         else:
@@ -229,12 +229,12 @@ def processar_csv_selenium(driver, caminho_csv, apenas_faltantes=False):
     logging.info(f'Arquivo atualizado: {caminho_csv}')
     return produtos_processados
 
-def contar_produtos_sem_barcode(caminho_csv):
+def contar_produtos_sem_codigo(caminho_csv):
     """
-    Conta quantos produtos ainda não têm barcode no CSV.
+    Conta quantos produtos ainda não têm codigo no CSV.
     """
     df = pd.read_csv(caminho_csv)
-    if 'BARCODE' not in df.columns:
+    if 'codigo' not in df.columns:
         nome_column = None
         for col in df.columns:
             if 'nome' in col.lower():
@@ -244,9 +244,9 @@ def contar_produtos_sem_barcode(caminho_csv):
             return len(df[df[nome_column].notna()])
         return 0
     
-    # Contar produtos sem barcode (vazios ou NaN)
-    sem_barcode = df[df['BARCODE'].isna() | (df['BARCODE'] == '')]
-    return len(sem_barcode)
+    # Contar produtos sem codigo (vazios ou NaN)
+    sem_codigo = df[df['codigo'].isna() | (df['codigo'] == '')]
+    return len(sem_codigo)
 
 def main():
     logging.basicConfig(
@@ -282,7 +282,7 @@ def main():
 
 3️⃣  IMPORTANTE: O Cloudflare pode aparecer NOVAMENTE no meio do processo! Se isso acontecer, o script vai PAUSAR AUTOMATICAMENTE e pedir para você resolver de novo. Tenha PACIÊNCIA, aguarde o Cloudflare liberar e só então aperte ENTER para continuar.
 
-4️⃣  NOVIDADE: O script agora faz buscas automáticas adicionais para produtos que não encontraram código de barras! Não precisa mais criar CSV manualmente para dados faltantes.
+4️⃣  NOVIDADE: O script agora faz buscas automáticas adicionais para produtos que não encontraram código! Não precisa mais criar CSV manualmente para dados faltantes.
 
 NÃO FECHE O NAVEGADOR enquanto o script estiver rodando!
 
@@ -303,42 +303,42 @@ NÃO FECHE O NAVEGADOR enquanto o script estiver rodando!
     faltantes_inicial = {}
     for arquivo in arquivos:
         caminho_csv = os.path.join(pasta_dados, arquivo)
-        faltantes = contar_produtos_sem_barcode(caminho_csv)
+        faltantes = contar_produtos_sem_codigo(caminho_csv)
         if faltantes > 0:
             faltantes_inicial[arquivo] = faltantes
             total_inicial_faltantes += faltantes
-            print(f"📄 {arquivo}: {faltantes} produtos sem barcode")
+            print(f"📄 {arquivo}: {faltantes} produtos sem código")
     
     if total_inicial_faltantes == 0:
-        print("\n✅ Todos os produtos já têm código de barras! Nada a fazer.")
+        print("\n✅ Todos os produtos já têm código! Nada a fazer.")
         driver.quit()
         return
     
-    print(f"\n🎯 Total de {total_inicial_faltantes} produtos precisam de código de barras")
+    print(f"\n🎯 Total de {total_inicial_faltantes} produtos precisam de código")
     print("="*80 + "\n")
     
-    # PASSAGENS - Buscar apenas produtos sem barcode
+    # PASSAGENS - Buscar apenas produtos sem codigo
     for tentativa in range(0, max_tentativas):
-        # Verificar quantos produtos ainda estão sem barcode
+        # Verificar quantos produtos ainda estão sem codigo
         total_faltantes = 0
         faltantes_por_arquivo = {}
         
         for arquivo in arquivos:
             caminho_csv = os.path.join(pasta_dados, arquivo)
-            faltantes = contar_produtos_sem_barcode(caminho_csv)
+            faltantes = contar_produtos_sem_codigo(caminho_csv)
             if faltantes > 0:
                 faltantes_por_arquivo[arquivo] = faltantes
                 total_faltantes += faltantes
         
         if total_faltantes == 0:
             print("\n" + "="*80)
-            print("✅ SUCESSO! Todos os produtos têm código de barras!")
+            print("✅ SUCESSO! Todos os produtos têm código!")
             print("="*80 + "\n")
             break
         
         print("\n" + "="*80)
         if tentativa == 0:
-            print(f"🔍 TENTATIVA {tentativa + 1}/{max_tentativas} - Buscando {total_faltantes} produtos sem barcode...")
+            print(f"🔍 TENTATIVA {tentativa + 1}/{max_tentativas} - Buscando {total_faltantes} produtos sem código...")
         else:
             print(f"🔄 TENTATIVA {tentativa + 1}/{max_tentativas} - Buscando {total_faltantes} produtos restantes...")
         print("="*80 + "\n")
@@ -356,7 +356,7 @@ NÃO FECHE O NAVEGADOR enquanto o script estiver rodando!
             faltantes_finais = {}
             for arquivo in arquivos:
                 caminho_csv = os.path.join(pasta_dados, arquivo)
-                faltantes = contar_produtos_sem_barcode(caminho_csv)
+                faltantes = contar_produtos_sem_codigo(caminho_csv)
                 if faltantes > 0:
                     total_final_faltantes += faltantes
                     faltantes_finais[arquivo] = faltantes
@@ -367,9 +367,9 @@ NÃO FECHE O NAVEGADOR enquanto o script estiver rodando!
                 print("="*80 + "\n")
                 
                 for arquivo, faltantes in faltantes_finais.items():
-                    print(f"📄 {arquivo}: {faltantes} produtos sem barcode")
+                    print(f"📄 {arquivo}: {faltantes} produtos sem código")
                 
-                print(f"\n⚠️  Total de {total_final_faltantes} produtos ainda sem código de barras.")
+                print(f"\n⚠️  Total de {total_final_faltantes} produtos ainda sem código.")
                 print("💡 Isso pode acontecer por limitações do Cloudflare ou produtos não cadastrados.")
                 print("💡 Você pode executar o script novamente mais tarde para tentar buscar os restantes.")
                 print("💡 O script vai pular automaticamente os que já têm código e buscar apenas os faltantes.")
@@ -385,13 +385,13 @@ NÃO FECHE O NAVEGADOR enquanto o script estiver rodando!
     total_final_faltantes = 0
     for arquivo in arquivos:
         caminho_csv = os.path.join(pasta_dados, arquivo)
-        faltantes = contar_produtos_sem_barcode(caminho_csv)
+        faltantes = contar_produtos_sem_codigo(caminho_csv)
         total_final_faltantes += faltantes
     
     total_encontrados = total_inicial_faltantes - total_final_faltantes
     
     if total_final_faltantes == 0:
-        print(f"✅ {total_encontrados}/{total_inicial_faltantes} códigos de barras encontrados com sucesso!")
+        print(f"✅ {total_encontrados}/{total_inicial_faltantes} códigos encontrados com sucesso!")
     else:
         print(f"📊 Estatísticas:")
         print(f"   ✅ Encontrados: {total_encontrados}/{total_inicial_faltantes}")
