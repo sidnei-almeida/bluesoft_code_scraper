@@ -11,3 +11,76 @@
 2025-07-15 05:20:28,701 - INFO - Get LATEST chromedriver version for google-chrome
 2025-07-15 05:20:28,760 - INFO - Driver [/home/sidnei/.wdm/drivers/chromedriver/linux64/138.0.7204.94/chromedriver-linux64/chromedriver] found in cache
 2025-07-15 05:20:42,550 - INFO - Processando: dados/mcdonalds_nutricional.csv
+2025-10-16 21:33:08,080 - INFO - ====== WebDriver manager ======
+2025-10-16 21:33:08,466 - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-16 21:33:08,606 - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-16 21:33:08,684 - INFO - There is no [linux64] chromedriver "141.0.7390.78" for browser google-chrome "141.0.7390" in cache
+2025-10-16 21:33:08,684 - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-16 21:33:08,916 - INFO - WebDriver version 141.0.7390.78 selected
+2025-10-16 21:33:08,921 - INFO - Modern chrome version https://storage.googleapis.com/chrome-for-testing-public/141.0.7390.78/linux64/chromedriver-linux64.zip
+2025-10-16 21:33:08,922 - INFO - About to download new driver from https://storage.googleapis.com/chrome-for-testing-public/141.0.7390.78/linux64/chromedriver-linux64.zip
+2025-10-16 21:33:09,329 - INFO - Driver downloading response is 200
+2025-10-16 21:33:11,541 - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-16 21:33:11,715 - INFO - Driver has been saved in cache [/home/sidnei/.wdm/drivers/chromedriver/linux64/141.0.7390.78]
+2025-10-16 21:33:39,821 - INFO - Processando: dados/produtos_nutricionais_adaptogen.csv
+2025-10-16 21:33:44,929 - ERROR - Erro ao buscar "Panic Pré Treino Limonada 300g": Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=141.0.7390.107)
+Stacktrace:
+#0 0x558321c9067a <unknown>
+#1 0x55832170f566 <unknown>
+#2 0x5583216e4380 <unknown>
+#3 0x55832178f998 <unknown>
+#4 0x5583217acce5 <unknown>
+#5 0x558321787403 <unknown>
+#6 0x558321753b02 <unknown>
+#7 0x5583217547c1 <unknown>
+#8 0x558321c54448 <unknown>
+#9 0x558321c582af <unknown>
+#10 0x558321c3b8d9 <unknown>
+#11 0x558321c58e55 <unknown>
+#12 0x558321c2113f <unknown>
+#13 0x558321c7d4b8 <unknown>
+#14 0x558321c7d693 <unknown>
+#15 0x558321c8f613 <unknown>
+#16 0x7f6c9e6a80d6 <unknown>
+
+2025-10-16 21:33:47,933 - ERROR - Erro ao buscar "Dila Pump Energy Formula Manga com Laranja 318g": Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=141.0.7390.107)
+Stacktrace:
+#0 0x558321c9067a <unknown>
+#1 0x55832170f566 <unknown>
+#2 0x5583216e4380 <unknown>
+#3 0x55832178f998 <unknown>
+#4 0x5583217acce5 <unknown>
+#5 0x558321787403 <unknown>
+#6 0x558321753b02 <unknown>
+#7 0x5583217547c1 <unknown>
+#8 0x558321c54448 <unknown>
+#9 0x558321c582af <unknown>
+#10 0x558321c3b8d9 <unknown>
+#11 0x558321c58e55 <unknown>
+#12 0x558321c2113f <unknown>
+#13 0x558321c7d4b8 <unknown>
+#14 0x558321c7d693 <unknown>
+#15 0x558321c8f613 <unknown>
+#16 0x7f6c9e6a80d6 <unknown>
+
+2025-10-16 21:33:56,516 - INFO - ====== WebDriver manager ======
+2025-10-16 21:33:56,601 - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-16 21:33:56,730 - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-16 21:33:56,863 - INFO - Driver [/home/sidnei/.wdm/drivers/chromedriver/linux64/141.0.7390.78/chromedriver-linux64/chromedriver] found in cache
+2025-10-16 21:34:14,820 - INFO - Processando: dados/produtos_nutricionais_adaptogen.csv
+2025-10-16 22:03:59,987 - INFO - Arquivo atualizado: dados/produtos_nutricionais_adaptogen.csv
+2025-10-17 13:24:49,406 - INFO - ====== WebDriver manager ======
+2025-10-17 13:24:49,777 - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-17 13:24:49,914 - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-17 13:24:50,000 - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-17 13:24:50,382 - INFO - WebDriver version 141.0.7390.78 selected
+2025-10-17 13:24:50,389 - INFO - Modern chrome version https://storage.googleapis.com/chrome-for-testing-public/141.0.7390.78/linux64/chromedriver-linux64.zip
+2025-10-17 13:24:50,390 - INFO - About to download new driver from https://storage.googleapis.com/chrome-for-testing-public/141.0.7390.78/linux64/chromedriver-linux64.zip
+2025-10-17 13:24:50,578 - INFO - Driver downloading response is 200
+2025-10-17 13:24:54,780 - INFO - Get LATEST chromedriver version for google-chrome
+2025-10-17 13:24:55,022 - INFO - Driver has been saved in cache [/home/sidnei/.wdm/drivers/chromedriver/linux64/141.0.7390.78]
+2025-10-17 13:25:12,503 - INFO - Processando: dados/dados_nutricionais_bebidas.csv

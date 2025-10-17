@@ -7,6 +7,9 @@ Repositório oficial: [https://github.com/sidnei-almeida/ean_code_finder](https:
 ## 🚀 Funcionalidades
 - Busca automática do código EAN/GTIN de cada produto usando o campo de busca do Cosmos Bluesoft.
 - Atualiza/cria a coluna `BARCODE` em cada CSV processado.
+- **✨ Busca inteligente:** O script verifica automaticamente quais produtos já têm código de barras e pula eles, buscando apenas os necessários desde o início!
+- **🔄 Múltiplas tentativas:** Faz até 3 tentativas automaticamente para encontrar códigos de barras de produtos faltantes.
+- **📊 Estatísticas detalhadas:** Mostra taxa de sucesso e progresso em tempo real.
 - Suporte a múltiplos arquivos CSV na pasta `dados/`.
 - Detecção automática do Cloudflare durante o processo, com instruções claras para o usuário.
 - Log detalhado do processo em `processar_dados.log`.
@@ -54,16 +57,24 @@ Repositório oficial: [https://github.com/sidnei-almeida/ean_code_finder](https:
    - Assim que o navegador abrir, **passe manualmente pela verificação do Cloudflare** (página "Um momento..." ou "Checking your browser...").
    - **Só aperte ENTER no terminal depois que o site estiver totalmente carregado e a barra de busca aparecer.**
    - **NÃO feche o navegador enquanto o script estiver rodando!**
-4. O script vai processar todos os CSVs na pasta `dados/`, preenchendo a coluna `BARCODE` com o código encontrado para cada produto.
+4. **O script vai:**
+   - Verificar automaticamente quais produtos já têm código de barras nos CSVs
+   - Mostrar quantos produtos precisam de código de barras
+   - Pular produtos que já têm código e buscar apenas os necessários
+   - Fazer até 3 tentativas para cada produto sem código
+   - Mostrar estatísticas em tempo real e ao final do processo
 5. **Se o Cloudflare aparecer novamente durante o processo:**
    - O script vai pausar automaticamente e mostrar um aviso super chamativo.
    - Resolva o Cloudflare manualmente no navegador e só então aperte ENTER no terminal para continuar.
    - Pode demorar alguns segundos para o script continuar após o ENTER.
-6. **Se alguns produtos não encontrarem código de barras:**
-   - Isso é normal e geralmente é culpa do Cloudflare.
-   - Você pode rodar o script novamente só com esses produtos em um novo CSV para tentar buscar os códigos que faltaram.
+6. **Execuções subsequentes:**
+   - Se executar o script novamente, ele detecta automaticamente os produtos que já têm código
+   - Busca apenas os produtos que ainda estão faltando
+   - Não precisa criar CSV manualmente com dados faltantes!
 
-## 📝 Exemplo de CSV de entrada
+## 📝 Exemplo de CSV
+
+**Antes (entrada):**
 ```csv
 NOME
 Coca-Cola 2L
@@ -71,9 +82,61 @@ Arroz Branco Tipo 1 5kg
 Leite Integral 1L
 ```
 
+**Depois (com barcodes):**
+```csv
+NOME,BARCODE
+Coca-Cola 2L,7894900011517
+Arroz Branco Tipo 1 5kg,7896005200025
+Leite Integral 1L,7891000100103
+```
+
+**Se executar novamente com produtos parcialmente preenchidos:**
+```csv
+NOME,BARCODE
+Coca-Cola 2L,7894900011517
+Arroz Branco Tipo 1 5kg,
+Leite Integral 1L,7891000100103
+```
+↓ *O script pula produtos que já têm código e busca apenas o que falta*
+```csv
+NOME,BARCODE
+Coca-Cola 2L,7894900011517
+Arroz Branco Tipo 1 5kg,7896005200025
+Leite Integral 1L,7891000100103
+```
+
 ## 🗂️ Saída
-- Os arquivos CSV originais na pasta `dados/` serão atualizados com a coluna `BARCODE` preenchida.
-- Um log detalhado será salvo em `processar_dados.log`.
+- Os arquivos CSV originais na pasta `dados/` são atualizados com a coluna `BARCODE` preenchida.
+- Um log detalhado é salvo em `processar_dados.log`.
+
+## 🧠 Como funciona a busca inteligente
+
+O script agora trabalha de forma muito mais eficiente:
+
+1. **Análise inicial:** Ao iniciar, verifica todos os CSVs e conta quantos produtos já têm código de barras
+2. **Pula produtos completos:** Não perde tempo buscando produtos que já têm código
+3. **Múltiplas tentativas:** Para produtos sem código, faz até 3 tentativas automáticas
+4. **Estatísticas em tempo real:** Mostra progresso e taxa de sucesso durante o processo
+5. **Execução incremental:** Se rodar o script várias vezes, ele sempre continua de onde parou
+
+**Exemplo de execução:**
+```
+📊 Verificando produtos nos CSVs...
+📄 alimentos.csv: 45 produtos sem barcode
+📄 bebidas.csv: 23 produtos sem barcode
+
+🎯 Total de 68 produtos precisam de código de barras
+
+🔍 TENTATIVA 1/3 - Buscando 68 produtos sem barcode...
+📄 Arquivo: alimentos.csv (45 produtos faltantes)
+[1/45] Buscando: Coca-Cola 2L
+✅ Código encontrado: 7894900011517
+...
+✅ 60 códigos encontrados nesta tentativa
+
+🔄 TENTATIVA 2/3 - Buscando 8 produtos restantes...
+...
+```
 
 ## 💡 Dicas importantes
 - **Compatível com Windows, Linux e Mac!**
@@ -81,7 +144,8 @@ Leite Integral 1L
 - **Às vezes o Cloudflare entra em um loop de carregamento infinito** (fica só "carregando" e não aparece a caixinha para clicar). Isso é normal e acontece por proteção do site. **Nesses casos, espere alguns minutos sem fechar a página**: normalmente, depois de um tempo, o Cloudflare libera e a caixinha volta a aparecer para você clicar. 
 - **Vale a pena tentar apertar F5 (atualizar a página)** para ver se o Cloudflare libera, mas **NUNCA feche a página do navegador** enquanto o script estiver rodando! Se fechar, o script vai perder a conexão com o navegador e dará erro.
 - **Nunca feche o navegador enquanto o script estiver rodando.**
-- Se o script for interrompido, você pode rodar novamente apenas com os produtos que faltaram.
+- **Se o script for interrompido:** Sem problemas! Execute novamente e ele vai pular automaticamente os produtos que já têm código de barras, buscando apenas os faltantes.
+- **Busca inteligente:** O script faz múltiplas passagens automaticamente para tentar encontrar todos os códigos de barras possíveis.
 - O tempo de espera entre buscas e pausas periódicas são essenciais para evitar bloqueios.
 
 ## ❓ Dúvidas ou problemas?
